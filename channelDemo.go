@@ -44,4 +44,14 @@ func main() {
 
 	//time.Sleep(time.Second)
 
+	ch1 := make(chan int, 4)
+	for i := 0; i < 10; i++ {
+		select {
+		case x := <-ch1:
+			fmt.Println(x)
+		case ch1 <- i:
+			fmt.Println(i)
+		}
+	}
+
 }
