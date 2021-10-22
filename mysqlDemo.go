@@ -137,17 +137,77 @@ func main() {
 		return
 	}
 	defer db.Close()
+
 	//Insert func
-	insertInto("insert into user(name,age) values (?,?)", "张三", 24)
+	//for i := 0; i < 10; i++ {
+	//	insertInto("insert into user(name,age) values (?,?)", "张三", 24+i*2)
+	//}
 
 	//Update func
-	updateRowDemo("update user set name=?,age=? where id = ?", "cindy", 17, 2)
+	//updateRowDemo("update user set name=?,age=? where id = ?", "cindy", 17, 2)
 
 	//Delete func
-	deleteRow("delete from user where id = ?", 8)
+	//deleteRow("delete from user where id = ?", 8)
 
 	//因为插入、更新和删除操作都使用Exec方法，所以如果封装得好的话，可以用updateRowDemo函数也能达到一样的效果
 	//Query func
 	//queryOne("select * from user where id =?")
 	//queryMore("select * from user")
+
+	//事务管理
+	mysqlDemo()
+}
+
+/*
+事务 https://www.liwenzhou.com/posts/Go/go_mysql/ 有点地方要注意，执行Exec()时,是用事务的tx.Exec() 而不是用db.Exec()
+*/
+func mysqlDemo() {
+	tx, err := db.Begin() //开启事务
+	if err != nil {
+		if tx != nil {
+			tx.Rollback() //回滚
+		}
+		fmt.Printf("begin trans failed, err %v \n", err)
+		return
+	}
+
+	sqlStr1 := "Update user set age =60 where id =?"
+	ret1, err := tx.Exec(sqlStr1, 5)
+	if err != nil {
+		tx.Rollback()
+		fmt.Printf("exec sql1 fail , err:%v \n", err)
+		return
+	}
+	aff1, err := ret1.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		fmt.Printf("exec ret1.RowsAffected() failed , err: %v \n", err)
+		return
+	}
+
+	//sqlStr2 := "Delete from user where id =?"
+	sqlStr2 := "Delete from user where name =?"
+	ret2, err := tx.Exec(sqlStr2, "张三")
+
+	if err != nil {
+		tx.Rollback()
+		fmt.Printf("exec sql1 fail , err:%v \n", err)
+	}
+	aff2, err := ret2.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		fmt.Printf("exec aff2.RowsAffected() failed , err: %v \n", err)
+		return
+	}
+
+	fmt.Println(aff1, aff2)
+	if aff1 == 1 && aff2 == 1 {
+		fmt.Println("提交事务")
+		tx.Commit()
+	} else {
+		tx.Rollback()
+		fmt.Println("事务回滚")
+	}
+	fmt.Println("exec trans success ")
+
 }
