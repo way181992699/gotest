@@ -9,7 +9,6 @@ import (
 /*
 操作Mysql
 */
-
 var db *sql.DB
 
 type user struct {
@@ -140,22 +139,22 @@ func main() {
 
 	//Insert func
 	//for i := 0; i < 10; i++ {
-	//	insertInto("insert into user(name,age) values (?,?)", "张三", 24+i*2)
+	//	insertInto("insert into t_user(name,age) values (?,?)", "张三", 24+i*2)
 	//}
 
 	//Update func
-	//updateRowDemo("update user set name=?,age=? where id = ?", "cindy", 17, 2)
+	//updateRowDemo("update t_user set name=?,age=? where id = ?", "cindy", 17, 3)
 
 	//Delete func
-	//deleteRow("delete from user where id = ?", 8)
+	//deleteRow("delete from t_user where id = ?", 8)
 
 	//因为插入、更新和删除操作都使用Exec方法，所以如果封装得好的话，可以用updateRowDemo函数也能达到一样的效果
 	//Query func
-	//queryOne("select * from user where id =?")
-	//queryMore("select * from user")
+	//queryOne("select * from t_user where id =?")
+	//queryMore("select * from t_user")
 
 	//事务管理
-	mysqlDemo()
+	//mysqlDemo()
 }
 
 /*
@@ -171,7 +170,7 @@ func mysqlDemo() {
 		return
 	}
 
-	sqlStr1 := "Update user set age =60 where id =?"
+	sqlStr1 := "Update t_user set age =60 where id =?"
 	ret1, err := tx.Exec(sqlStr1, 5)
 	if err != nil {
 		tx.Rollback()
@@ -185,8 +184,8 @@ func mysqlDemo() {
 		return
 	}
 
-	//sqlStr2 := "Delete from user where id =?"
-	sqlStr2 := "Delete from user where name =?"
+	//sqlStr2 := "Delete from t_user where id =?"
+	sqlStr2 := "Delete from t_user where name =?"
 	ret2, err := tx.Exec(sqlStr2, "张三")
 
 	if err != nil {
